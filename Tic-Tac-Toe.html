@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tic‑Tac‑Toe Demo (with a bug!)</title>
+  <style>
+    body {
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      font-family:system-ui, sans-serif;
+      margin-top:2rem;
+    }
+    #board {
+      display:grid;
+      grid-template-columns:repeat(3,100px);
+      grid-template-rows:repeat(3,100px);
+      gap:4px;
+    }
+    .cell {
+      width:100px;
+      height:100px;
+      background:#f6f6f6;
+      border:2px solid #ccc;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:2.5rem;
+      cursor:pointer;
+      user-select:none;
+    }
+    #status {
+      margin-top:1rem;
+      font-size:1.25rem;
+      min-height:1.5em;
+    }
+    #playAgain {
+      margin-top:.75rem;
+      padding:.5rem 1rem;
+      font-size:1rem;
+      cursor:pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tic‑Tac‑Toe Demo</h1>
+  <p>Diagonal wins currently <strong>do not work</strong> – try it and ask Copilot to fix! ⚠️</p>
+  <div id="board">
+    <div class="cell" data-index="0"></div>
+    <div class="cell" data-index="1"></div>
+    <div class="cell" data-index="2"></div>
+    <div class="cell" data-index="3"></div>
+    <div class="cell" data-index="4"></div>
+    <div class="cell" data-index="5"></div>
+    <div class="cell" data-index="6"></div>
+    <div class="cell" data-index="7"></div>
+    <div class="cell" data-index="8"></div>
+  </div>
+  <p id="status"></p>
+  <button id="playAgain" style="display:none;">Play again</button>
+
+<script>
+  const board = Array(9).fill(null);
+  let currentPlayer = "X";
+  const statusEl = document.getElementById("status");
+  const playAgainBtn = document.getElementById("playAgain");
+
+  function handleCellClick(e) {
+    const idx = +e.target.dataset.index;
+    if (board[idx] || checkWin()) return;
+
+    board[idx] = currentPlayer;
+    e.target.textContent = currentPlayer;
+
+    const winner = checkWin();
+    if (winner) {
+      statusEl.textContent = `${winner} wins! 🎉`;
+      playAgainBtn.style.display = "inline-block";
+      return;
+    }
+
+    if (board.every(Boolean)) {
+      statusEl.textContent = "Remis!";
+      playAgainBtn.style.display = "inline-block";
+      return;
+    }
+
+    currentPlayer = currentPlayer === "X" ? "O" : "X";
+    statusEl.textContent = `Turn: ${currentPlayer}`;
+  }
+
+  function checkWin() {
+    const lines = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8]
+    ];
+
+    for (const [a, b, c] of lines) {
+      if (board[a] && board[a] === board[b] && board[a] === board[c]) return board[a];
+    }
+    return null;
+  }
+
+  function reset() {
+    board.fill(null);
+    document.querySelectorAll('.cell').forEach(c => (c.textContent = ""));
+    currentPlayer = "X";
+    statusEl.textContent = "Turn: X";
+    playAgainBtn.style.display = "none";
+  }
+
+  document.querySelectorAll('.cell').forEach(c => c.addEventListener('click', handleCellClick));
+  playAgainBtn.addEventListener('click', reset);
+  // reset button on R key for quick demo
+  window.addEventListener('keydown', e => e.key === 'r' && reset());
+  statusEl.textContent = "Turn: X";
+</script>
+</body>
+</html>
